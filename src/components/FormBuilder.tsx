@@ -1,7 +1,9 @@
 // components/form_builder.tsx
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
+import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { useToast } from "./ui/use-toast";
@@ -27,6 +29,7 @@ type FormSchema = {
 };
 
 const FormBuilder = () => {
+  const navigate = useNavigate();
   const [fields, setFields] = useState<FormField[]>(() => {
     const savedSchema = localStorage.getItem("formSchema");
     return savedSchema ? JSON.parse(savedSchema).fields : [];
@@ -61,40 +64,70 @@ const FormBuilder = () => {
       showToast({ description: "All fields must have labels!", variant: "destructive" });
       return;
     }
-    const schema = {
-      formTitle: "Generated Form",
-      fields,
-    };
-    localStorage.setItem("formSchema", JSON.stringify(schema));
-    console.log("Generated Schema:", JSON.stringify(schema, null, 2));
-    showToast({ description: "Schema generated successfully!" });
+
+    navigate("/form");
+    // const schema = {
+    //   formTitle: "Generated Form",
+    //   fields,
+    // };
+    // localStorage.setItem("formSchema", JSON.stringify(schema));
+    // console.log("Generated Schema:", JSON.stringify(schema, null, 2));
+    // showToast({ description: "Schema generated successfully!" });
   };
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">Form Builder</h2>
+      <h2 className="text-xl font-bold mb-4 text-black">Form Builder</h2>
       {fields.map((field) => (
-        <Card key={field.id}>
-          <CardContent>
+        <Card
+          key={field.id}
+          headerContent={
+            <>
+              <h3 className="text-lg font-semibold text-black w-full">{field.label}</h3>
+              {fields.length > 0 && <TrashIcon className="h-6 w-6 mx-6 text-red-600" onClick={() => removeField(field.id)} />}
+              <ChevronUpIcon className="h-6 w-6 text-gray-600" />
+            </>
+          }
+        >
+          <div className="flex space-x-2 items-center">
             <Input
               type="text"
-              placeholder="Field Label"
+              placeholder="Question Title"
               value={field.label}
               onChange={(e) => updateField(field.id, { label: e.target.value })}
+              className="w-full"
             />
+            {allFieldsValid && <CheckCircleIcon className="h-5 w-5 text-green-500 ml-2" />}
+            <ChevronDownIcon className="h-5 w-5 text-gray-400" />
+          </div>
+          <div className="flex space-x-2 items-center">
             <Select
               value={field.type}
+              placeholder="Question Type"
+              className="mt-4 mb-4 w-full"
               onChange={(e) => updateField(field.id, { type: e.target.value as FieldType })}
             >
               <option value="text">Text</option>
               <option value="number">Number</option>
               <option value="select">Select</option>
             </Select>
+            <label className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                checked={field.required || false}
+                onChange={(e) => updateField(field.id, { required: e.target.checked })}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="ml-2 text-black">Required</span>
+            </label>
+          </div>
             {field.type === "select" && (
               <Input
                 type="text"
                 placeholder="Comma-separated options"
                 onChange={(e) => updateField(field.id, { options: e.target.value.split(",") })}
+                className="w-full"
+                value={field.options?.join(",") || ""}
               />
             )}
             {field.type === "text" && (
@@ -130,22 +163,15 @@ const FormBuilder = () => {
                 />
               </div>
             )}
-            <label className="flex items-center mt-2">
-              <input
-                type="checkbox"
-                checked={field.required || false}
-                onChange={(e) => updateField(field.id, { required: e.target.checked })}
-              />
-              <span className="ml-2">Required</span>
-            </label>
-            <Button variant="secondary" onClick={() => removeField(field.id)}>
-              Remove
-            </Button>
-          </CardContent>
         </Card>
       ))}
-      {allFieldsValid && <Button onClick={addField} className="mr-2">Add Question</Button>}
-      {allFieldsValid && fields.length >=1 && <Button variant="primary" onClick={generateSchema} className="mt-4">Generate Schema</Button>}
+      <div className="flex">
+        {allFieldsValid && <Button onClick={addField} className="mr-2 bg-white flex items-center">
+          <PlusIcon className="h-6 w-6 text-gray-600 height-10 sm-full" />
+          Add Question
+        </Button>}
+        {allFieldsValid && fields.length >=1 && <Button variant="secondary" onClick={generateSchema} className="flex items-center">Generate Schema</Button>}
+      </div>
       {ToastComponent}
     </div>
   );

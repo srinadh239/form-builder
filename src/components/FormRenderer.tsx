@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { Button } from "./ui/button";
-import { Card, CardContent } from "./ui/card";
 
 interface FormField {
   id: string;
@@ -95,37 +94,34 @@ const FormRenderer = () => {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">{formSchema.formTitle}</h2>
-        <Card>
-          <CardContent>
-            {formSchema.fields.map((field) => (
-              <>
-                <label className="block text-sm font-medium mb-1">{field.label}</label>
-                {field.type === "select" ? (
-                  <Select
-                    value={formData[field.id] || ""}
-                    onChange={(e) => handleChange(field.id, e.target.value)}
-                    className={errors[field.id] ? "border-red-500" : ""}
-                  >
-                    <option value="">Select an option</option>
-                    {field.options?.map((option) => (
-                      <option key={option} value={option}>{option}</option>
-                    ))}
-                  </Select>
-                ) : (
-                  <Input
-                    type={field.type === "number" ? "number" : "text"}
-                    value={formData[field.id] || ""}
-                    onChange={(e) => handleChange(field.id, e.target.value)}
-                    className={errors[field.id] ? "border-red-500" : ""}
-                  />
-                )}
-                {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
-              </>
-            ))}
-          </CardContent>
-        </Card>
-      <Button variant="primary" onClick={handleSubmit} className="mt-4">Submit</Button>
+        <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 mb-4 p-4">
+          {formSchema.fields.map((field) => (
+            <div key={field.id} className="mb-4">
+              {field.type === "select" ? (
+                <Select
+                  value={formData[field.id] || ""}
+                  onChange={(e) => handleChange(field.id, e.target.value)}
+                  className={errors[field.id] ? "border-red-500" : ""}
+                >
+                  <option value="">Select an option</option>
+                  {field.options?.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </Select>
+              ) : (
+                <Input
+                  placeholder={field.label}
+                  type={field.type === "number" ? "number" : "text"}
+                  value={formData[field.id] || ""}
+                  onChange={(e) => handleChange(field.id, e.target.value)}
+                  className={errors[field.id] ? "border-red-500" : ""}
+                />
+              )}
+              {errors[field.id] && <p className="text-red-500 text-sm mt-1">{errors[field.id]}</p>}
+            </div>
+          ))}
+        </div>
+      <Button variant="secondary" onClick={handleSubmit} className="mt-4 bg-w">Submit</Button>
     </div>
   );
 };
