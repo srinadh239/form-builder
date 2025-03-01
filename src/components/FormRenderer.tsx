@@ -77,7 +77,7 @@ const FormRenderer = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    formSchema.fields.forEach((field) => {
+    formSchema?.fields.forEach((field) => {
       const value = formData[field.id] || "";
       const errorMessage = validateField(field, value);
       if (errorMessage) {
@@ -105,7 +105,7 @@ const FormRenderer = () => {
   return (
     <div className="p-6">
         <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 mb-4 p-4">
-          {formSchema.fields.map((field) => (
+          {formSchema?.fields.map((field) => (
             <div key={field.id} className="mb-4">
               {field.type === "select" ? (
                 <Select
