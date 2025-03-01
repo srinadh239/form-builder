@@ -8,7 +8,7 @@ interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({ headerContent, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 mb-4">

@@ -1,12 +1,14 @@
 // components/form_builder.tsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { NavLink } from "react-router";
+import { ArrowPathIcon, CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { useToast } from "./ui/use-toast";
+import { randomDelay } from "../utils/delay";
+import { Loader } from './ui/loader';
 
 type FieldType = "text" | "number" | "select";
 
@@ -14,6 +16,7 @@ type FormField = {
   id: string;
   label: string;
   type: FieldType;
+  value?: string;
   required?: boolean;
   minLength?: number;
   maxLength?: number;
@@ -29,11 +32,10 @@ type FormSchema = {
 };
 
 const FormBuilder = () => {
-  const navigate = useNavigate();
-  const [fields, setFields] = useState<FormField[]>(() => {
-    const savedSchema = localStorage.getItem("formSchema");
-    return savedSchema ? JSON.parse(savedSchema).fields : [];
-  });
+  const [loadingSchema, setLoadingSchema] = useState(true);
+  const [addingQuestion, setAddingQuestion] = useState(false);
+  const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const [fields, setFields] = useState<FormField[]>([]);
   const { showToast, ToastComponent } = useToast();
 
   const allFieldsValid = fields.every(
@@ -41,22 +43,45 @@ const FormBuilder = () => {
   );
 
   useEffect(() => {
-    if (allFieldsValid) {
+    const storedSchema = localStorage.getItem("formSchema");
+
+    if (storedSchema) {
+      randomDelay(500, 1000).then(() => {
+        setLoadingSchema(false);
+        setFields(JSON.parse(storedSchema).fields || []);
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (allFieldsValid && !loadingSchema) {
       const schema: FormSchema = { formTitle: "Generated Form", fields };
       localStorage.setItem("formSchema", JSON.stringify(schema));
     }
-  }, [fields, allFieldsValid]);
+  }, [fields, allFieldsValid, loadingSchema]);
 
-  const addField = () => {
-    setFields([...fields, { id: Date.now().toString(), label: "", type: "text" }]);
+  const addField = async () => {
+    setAddingQuestion(true);
+    randomDelay(500, 1000).then(() => {
+      setAddingQuestion(false);
+      setFields([...fields, { id: Date.now().toString(), label: "", type: "text" }]);
+    });
   };
 
   const updateField = (id: string, updatedField: Partial<FormField>) => {
-    setFields(fields.map((field) => (field.id === id ? { ...field, ...updatedField } : field)));
+    setLoading({[id]: true });
+    randomDelay(50, 100).then(() => {
+      setLoading({[id]: false });
+      setFields(fields.map((field) => (field.id === id ? { ...field, ...updatedField } : field)));
+    });
   };
 
-  const removeField = (id: string) => {
-    setFields(fields.filter((field) => field.id !== id));
+  const removeField = async (id: string) => {
+    setLoading({[id]: true });
+    randomDelay(500, 1000).then(() => {
+      setLoading({[id]: false });
+      setFields(fields.filter((field) => field.id !== id));
+    });
   };
 
   const generateSchema = () => {
@@ -64,16 +89,13 @@ const FormBuilder = () => {
       showToast({ description: "All fields must have labels!", variant: "destructive" });
       return;
     }
-
-    navigate("/form");
-    // const schema = {
-    //   formTitle: "Generated Form",
-    //   fields,
-    // };
-    // localStorage.setItem("formSchema", JSON.stringify(schema));
-    // console.log("Generated Schema:", JSON.stringify(schema, null, 2));
-    // showToast({ description: "Schema generated successfully!" });
   };
+
+  if (loadingSchema) {
+    return <div className="flex justify-center items-center h-screen">
+      <Loader />
+    </div>;
+  }
 
   return (
     <div className="p-6">
@@ -84,7 +106,16 @@ const FormBuilder = () => {
           headerContent={
             <>
               <h3 className="text-lg font-semibold text-black w-full">{field.label}</h3>
-              {fields.length > 0 && <TrashIcon className="h-6 w-6 mx-6 text-red-600" onClick={() => removeField(field.id)} />}
+              {loading[field.id] ?
+                <ArrowPathIcon className="h-6 w-6 mx-6 text-gray-600" />
+                  : <TrashIcon 
+                      className="h-6 w-6 mx-6 text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeField(field.id)
+                      }} 
+                    />
+              } 
               <ChevronUpIcon className="h-6 w-6 text-gray-600" />
             </>
           }
@@ -97,7 +128,11 @@ const FormBuilder = () => {
               onChange={(e) => updateField(field.id, { label: e.target.value })}
               className="w-full"
             />
-            {allFieldsValid && <CheckCircleIcon className="h-5 w-5 text-green-500 ml-2" />}
+            {allFieldsValid && <>
+              {
+                loading[field.id] ? <ArrowPathIcon className="h-6 w-6 text-gray-600" /> : <CheckCircleIcon className="h-5 w-5 text-green-500 ml-2" />
+              }
+            </>}
             <ChevronDownIcon className="h-5 w-5 text-gray-400" />
           </div>
           <div className="flex space-x-2 items-center">
@@ -166,11 +201,13 @@ const FormBuilder = () => {
         </Card>
       ))}
       <div className="flex">
-        {allFieldsValid && <Button onClick={addField} className="mr-2 bg-white flex items-center">
-          <PlusIcon className="h-6 w-6 text-gray-600 height-10 sm-full" />
+        {allFieldsValid && <Button onClick={addField} className="mr-2 bg-white flex items-center" disabled={addingQuestion}>
+          {addingQuestion ? <ArrowPathIcon className="h-6 w-6 mx-6 text-gray-600" />
+             : <PlusIcon className="h-6 w-6 text-gray-600" />
+          }
           Add Question
         </Button>}
-        {allFieldsValid && fields.length >=1 && <Button variant="secondary" onClick={generateSchema} className="flex items-center">Generate Schema</Button>}
+        {allFieldsValid && fields.length >=1 && <NavLink to="/form"><Button variant="secondary" onClick={generateSchema} className="flex items-center">Generate Schema</Button></NavLink>}
       </div>
       {ToastComponent}
     </div>
