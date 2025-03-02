@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { Button } from "./ui/button";
 import { randomDelay } from "../utils/delay";
 import { Loader } from './ui/loader';
+import { useToast } from "./ui/use-toast";
 
 interface FormField {
   id: string;
@@ -29,6 +31,9 @@ const FormRenderer = () => {
   const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
+  const { showToast, ToastComponent } = useToast();
 
   useEffect(() => {
     const storedSchema = localStorage.getItem("formSchema");
@@ -88,6 +93,15 @@ const FormRenderer = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const getFieldNames = () => {
+    const newFields: Record<string, string> = {};
+    formSchema?.fields.forEach((field) => {
+      const value = formData[field.id] || "";
+      newFields[field.label] = value;
+    });
+    return newFields;
+  };
+
   const handleChange = (id: string, value: string) => {
     setFormData((prev) => ({ ...prev, [id]: value }));
     const field = formSchema?.fields.find((f) => f.id === id);
@@ -98,7 +112,12 @@ const FormRenderer = () => {
 
   const handleSubmit = () => {
     if (validateForm()) {
-      alert("Form submitted successfully!\n" + JSON.stringify(formData, null, 2));
+      setLoading(true);
+      randomDelay(500, 1000).then(() => {
+        showToast({ description: "Form Submitted Successfully" });
+        setLoading(false);
+        setFormSubmitted(true);
+      });
     }
   };
 
@@ -122,7 +141,7 @@ const FormRenderer = () => {
                 <Input
                   placeholder={field.label}
                   type={field.type === "number" ? "number" : "text"}
-                  value={field.value || ""}
+                  value={field.value}
                   onChange={(e) => handleChange(field.id, e.target.value)}
                   className={errors[field.id] ? "border-red-500" : ""}
                 />
@@ -131,7 +150,17 @@ const FormRenderer = () => {
             </div>
           ))}
         </div>
-      <Button variant="secondary" onClick={handleSubmit} className="mt-4 bg-w">Submit</Button>
+      {formSubmitted ? <div>
+          <label 
+            className={`absolute left-3 text-black text-sm`} 
+          >
+            {JSON.stringify(getFieldNames(), null, 2)}
+          </label>
+        </div> : <Button variant="secondary" onClick={handleSubmit} className="mt-4 bg-w flex items-center">
+        {loading && <ArrowPathIcon className="h-6 w-6 mx-6 text-gray-600" />}
+        Submit
+      </Button>}
+      {ToastComponent}
     </div>
   );
 };
