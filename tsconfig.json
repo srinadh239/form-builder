@@ -2,8 +2,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "jsx": "react",
     "sourceMap": true,
@@ -27,7 +27,7 @@
     "allowJs": false
   },
   "files": [],
-  "include": ["src", "./jest.setup.ts"],
+  "include": ["src"],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
