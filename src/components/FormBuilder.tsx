@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { NavLink } from "react-router";
 import { ArrowPathIcon, CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Button } from "./ui/button";
-import { Card } from "./ui/card";
+import { Accordion } from "./ui/accordion";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { useToast } from "./ui/use-toast";
@@ -32,6 +32,7 @@ type FormSchema = {
 };
 
 const FormBuilder = () => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [loadingSchema, setLoadingSchema] = useState(true);
   const [addingQuestion, setAddingQuestion] = useState(false);
   const [loading, setLoading] = useState<Record<string, boolean>>({});
@@ -65,6 +66,7 @@ const FormBuilder = () => {
     randomDelay(500, 1000).then(() => {
       setAddingQuestion(false);
       setFields([...fields, { id: Date.now().toString(), label: "", type: "text" }]);
+      setOpenIndex(fields.length);
     });
   };
 
@@ -100,8 +102,8 @@ const FormBuilder = () => {
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4 text-black">Form Builder</h2>
-      {fields.map((field) => (
-        <Card
+      {fields.map((field, index) => (
+        <Accordion
           key={field.id}
           headerContent={
             <>
@@ -119,6 +121,8 @@ const FormBuilder = () => {
               <ChevronUpIcon className="h-6 w-6 text-gray-600" />
             </>
           }
+          isOpen={openIndex === index}
+          onToggle={() => setOpenIndex(openIndex === index ? null : index)}
         >
           <div className="flex space-x-2 items-center">
             <Input
@@ -198,7 +202,7 @@ const FormBuilder = () => {
                 />
               </div>
             )}
-        </Card>
+        </Accordion>
       ))}
       <div className="flex">
         {allFieldsValid && <Button onClick={addField} className="mr-2 bg-white flex items-center" disabled={addingQuestion}>

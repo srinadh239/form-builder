@@ -1,54 +1,64 @@
-# React + TypeScript + Vite
+# Form Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Form Builder is a dynamic tool that enables users to create, customize, and validate forms seamlessly within web applications. The generated form schema is stored in local storage, facilitating easy retrieval and management.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Dynamic Form Creation**: Effortlessly create forms with various input types, including text, select.
+- **Real-Time Validation**: Ensure data integrity with real-time validation, providing immediate feedback to users.
+- **Auto-Save**: Automatically saves the form schema to local storage when all fields are valid.
+- **Smooth UI Interactions**: Includes animated accordion-style cards, floating placeholders, and interactive validation messages.
+- **Loading Indicators**: Displays loading icons for actions with delays.
+- **Form Rendering**: Generates and validates forms dynamically using a saved schema.
 
-## Expanding the ESLint configuration
+## Demo
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Experience the live demo: [Form Builder Demo](https://form-builder-one-sable.vercel.app)
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Getting Started
+
+Follow these instructions to set up the project locally.
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- [Node.js](https://nodejs.org/) (version 14 or higher)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+
+### Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/srinadh239/form-builder.git
+   cd form-builder
+   ```
+
+````
+2. **Install Dependencies
+
+Using npm:
+```bash
+npm install
+````
+
+Or using yarn:
+
+```bash
+yarn install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Running the application
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To start the development server:
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+npm run dev
+```
+
+Or using yarn:
+
+```bash
+yarn dev
 ```
