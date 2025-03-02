@@ -1,33 +1,5 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "jsx": "react",
-    "sourceMap": true,
-    "resolveJsonModule": true,
-    // "esModuleInterop": true,
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "paths": {
-      "@/*": ["src/*"]
-    },
-    "isolatedModules": true,
-    "noEmit": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": false,
-    "skipLibCheck": false,
-    "types": [
-      "vite/client",
-      "jest",
-      "@types/react"
-    ],
-    "allowJs": false
-  },
   "files": [],
-  "include": ["src"],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
