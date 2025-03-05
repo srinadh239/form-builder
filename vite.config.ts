@@ -14,5 +14,8 @@ export default defineConfig({
     environment: "jsdom",
     // global test setup
     // setupFiles: "./setup.js",
-  }
+  },
+  build: {
+    emptyOutDir: false,
+  },
 } as UserConfig)

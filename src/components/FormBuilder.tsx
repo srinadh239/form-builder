@@ -45,13 +45,13 @@ const FormBuilder = () => {
 
   useEffect(() => {
     const storedSchema = localStorage.getItem("formSchema");
-
-    if (storedSchema) {
-      randomDelay(500, 1000).then(() => {
-        setLoadingSchema(false);
+  
+    randomDelay(500, 1000).then(() => {
+      setLoadingSchema(false);
+      if (storedSchema) {
         setFields(JSON.parse(storedSchema).fields || []);
-      });
-    }
+      }
+    });
   }, []);
 
   useEffect(() => {

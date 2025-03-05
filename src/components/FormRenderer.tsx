@@ -37,20 +37,14 @@ const FormRenderer = () => {
 
   useEffect(() => {
     const storedSchema = localStorage.getItem("formSchema");
-
-    if (storedSchema) {
-      randomDelay(500, 1000).then(() => {
-        setLoadingSchema(false);
+console.log(storedSchema)
+    randomDelay(500, 1000).then(() => {
+      setLoadingSchema(false);
+      if (storedSchema) {
         setFormSchema({...JSON.parse(storedSchema)});
-      });
-    }
+      }
+    });
   }, []);
-
-  if (loadingSchema) {
-    return <div className="flex justify-center items-center h-screen">
-      <Loader />
-    </div>;
-  }
 
   const validateField = (field: any, value: string) => {
     if (!value.trim() && field.required) {
@@ -120,6 +114,18 @@ const FormRenderer = () => {
       });
     }
   };
+
+  if (loadingSchema) {
+    return <div className="flex justify-center items-center h-screen">
+      <Loader />
+    </div>;
+  }
+
+  if (!loadingSchema && (!formSchema || formSchema.fields.length === 0)) {
+    return <div className="flex justify-center items-center h-screen">
+      <p className="text-2xl">No form schema found.</p>
+    </div>;
+  }
 
   return (
     <div className="p-6">
